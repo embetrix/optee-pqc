@@ -73,18 +73,34 @@ C API: [client/pqc_tz_client.h](client/pqc_tz_client.h).
 
 ### Timing
 
-Set `PQC_TZ_TIMING=1` to print each command's invocation time in milliseconds
-to stderr, including failed invocations:
+Set `PQC_TZ_TIMING=1` to print invocation time in milliseconds to stderr:
 
 ```sh
 PQC_TZ_TIMING=1 pqc_tz_client generate mlkem768
-PQC_TZ_TIMING=1 sh tests/pqc-tz-test.sh
 ```
 
-Timing uses a monotonic clock around `TEEC_InvokeCommand()`. It includes
-invocation overhead and TA processing, including key storage access, but excludes
-session setup, client shared-memory allocation and copying, and file I/O.
-Timing is disabled when the variable is unset or has any value other than `1`.
+Includes invocation overhead and TA processing; excludes session setup and client
+file I/O. Disabled by default for standalone client commands.
+
+## Tests and benchmarks
+
+Run on the OP-TEE target with `pqc_tz_client` in `PATH`:
+
+```sh
+sh tests/pqc-tz-test.sh
+# Customize measured runs (default: 5) and save reports in a new directory:
+PQC_BENCH_RUNS=20 PQC_BENCH_DIR=./benchmark-results sh tests/pqc-tz-test.sh
+# Correctness tests only:
+PQC_TZ_TIMING=0 sh tests/pqc-tz-test.sh
+```
+
+Tests all six algorithms. Benchmarks ML-DSA signing/verifying at nine message sizes
+from 0 to 65536 bytes, and ML-KEM encapsulation/decapsulation at fixed input sizes.
+One warm-up per case is excluded.
+
+Prints min/median/average/max times in milliseconds and saves `summary.csv` and
+`samples.csv` in the reported directory (temporary by default). `PQC_BENCH_DIR`
+must not already exist. Test keys and working files are removed afterward.
 
 ## Security considerations
 
