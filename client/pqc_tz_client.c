@@ -4,9 +4,39 @@
  * Embetrix Embedded Systems Solutions, ayoub.zaki@embetrix.com
  *
  */
+#define _POSIX_C_SOURCE 200809L
+#include <inttypes.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include "pqc_tz_client.h"
+
+static const char *command_name(uint32_t command)
+{
+	switch (command) {
+	case PQC_GENERATE:
+		return "generate";
+	case PQC_LIST:
+		return "list";
+	case PQC_PUBLIC:
+		return "public";
+	case PQC_DELETE:
+		return "delete";
+	case PQC_ENCAPSULATE:
+	case PQC_ENCAPSULATE_ALG:
+		return "encap";
+	case PQC_DECAPSULATE:
+		return "decap";
+	case PQC_SIGN:
+		return "sign";
+	case PQC_VERIFY:
+	case PQC_VERIFY_ALG:
+		return "verify";
+	default:
+		return "unknown";
+	}
+}
 
 static TEEC_Result local_error(struct pqc_tz_client *client, TEEC_Result result)
 {
@@ -108,6 +138,9 @@ TEEC_Result pqc_call(struct pqc_tz_client *client, uint32_t command,
 	TEEC_SharedMemory out = { .flags = TEEC_MEM_OUTPUT };
 	TEEC_Operation op = { 0 };
 	TEEC_Result result;
+	struct timespec start, end;
+	const char *timing_env;
+	bool timed;
 	size_t capacity;
 
 	if (client)
@@ -138,8 +171,19 @@ TEEC_Result pqc_call(struct pqc_tz_client *client, uint32_t command,
 	op.params[1].memref.size = request_len;
 	op.params[2].memref.parent = &out;
 	op.params[2].memref.size = capacity;
+	timing_env = getenv("PQC_TZ_TIMING");
+	timed = timing_env && !strcmp(timing_env, "1") &&
+		!clock_gettime(CLOCK_MONOTONIC, &start);
 	result = TEEC_InvokeCommand(&client->session, command, &op,
 				    &client->error_origin);
+	if (timed && !clock_gettime(CLOCK_MONOTONIC, &end)) {
+		double elapsed_ms = (double)(end.tv_sec - start.tv_sec) * 1000.0 +
+				    (double)(end.tv_nsec - start.tv_nsec) / 1e6;
+
+		fprintf(stderr,
+			"pqc_tz_client: %s invoke time: %.3f ms (result=0x%08" PRIx32 ")\n",
+			command_name(command), elapsed_ms, result);
+	}
 	if (!result && op.params[2].memref.size > capacity)
 		result = local_error(client, TEEC_ERROR_COMMUNICATION);
 	if (!result && op.params[2].memref.size)

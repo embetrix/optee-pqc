@@ -71,6 +71,21 @@ pqc_tz_client verify PUBLIC_KEY_FILE MESSAGE_FILE SIGNATURE_FILE [CONTEXT_FILE]
 
 C API: [client/pqc_tz_client.h](client/pqc_tz_client.h).
 
+### Timing
+
+Set `PQC_TZ_TIMING=1` to print each command's invocation time in milliseconds
+to stderr, including failed invocations:
+
+```sh
+PQC_TZ_TIMING=1 pqc_tz_client generate mlkem768
+PQC_TZ_TIMING=1 sh tests/pqc-tz-test.sh
+```
+
+Timing uses a monotonic clock around `TEEC_InvokeCommand()`. It includes
+invocation overhead and TA processing, including key storage access, but excludes
+session setup, client shared-memory allocation and copying, and file I/O.
+Timing is disabled when the variable is unset or has any value other than `1`.
+
 ## Security considerations
 
 - All callers can use or delete any stored key.
