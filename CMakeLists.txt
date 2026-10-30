@@ -44,16 +44,16 @@ endif()
 if(PQC_BUILD_CLIENT)
     find_path(PQC_TEEC_INCLUDE tee_client_api.h HINTS "${PQC_TEEC_ROOT}/include" REQUIRED)
     find_library(PQC_TEEC_LIBRARY teec HINTS "${PQC_TEEC_ROOT}/lib" REQUIRED)
-    add_library(pqc-client-lib STATIC client/pqc_client.c)
-    target_include_directories(pqc-client-lib PUBLIC include client "${PQC_TEEC_INCLUDE}")
-    target_link_libraries(pqc-client-lib PUBLIC "${PQC_TEEC_LIBRARY}")
-    target_compile_options(pqc-client-lib PRIVATE -Wall -Wextra -Werror)
-    add_executable(pqc-client client/main.c)
-    target_link_libraries(pqc-client PRIVATE pqc-client-lib)
-    target_compile_options(pqc-client PRIVATE -Wall -Wextra -Werror)
-    install(TARGETS pqc-client pqc-client-lib
+    add_library(pqc_tz_client_lib STATIC client/pqc_tz_client.c)
+    target_include_directories(pqc_tz_client_lib PUBLIC include client "${PQC_TEEC_INCLUDE}")
+    target_link_libraries(pqc_tz_client_lib PUBLIC "${PQC_TEEC_LIBRARY}")
+    target_compile_options(pqc_tz_client_lib PRIVATE -Wall -Wextra -Werror)
+    add_executable(pqc_tz_client client/main.c)
+    target_link_libraries(pqc_tz_client PRIVATE pqc_tz_client_lib)
+    target_compile_options(pqc_tz_client PRIVATE -Wall -Wextra -Werror)
+    install(TARGETS pqc_tz_client pqc_tz_client_lib
         RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
         ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}")
-    install(FILES client/pqc_client.h include/pqc_algorithms.h include/pqc_protocol.h
+    install(FILES client/pqc_tz_client.h include/pqc_algorithms.h include/pqc_protocol.h
         DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/optee-pqc")
 endif()

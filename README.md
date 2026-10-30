@@ -46,10 +46,10 @@ Run on the target. Output files must not already exist.
 ### Keys
 
 ```sh
-pqc-client generate mlkem768
-pqc-client list
-pqc-client public ID PUBLIC_KEY_FILE
-pqc-client delete ID
+pqc_tz_client generate mlkem768
+pqc_tz_client list
+pqc_tz_client public ID PUBLIC_KEY_FILE
+pqc_tz_client delete ID
 ```
 
 `generate` prints the key ID. Choose `mlkem512`, `mlkem768`, `mlkem1024`,
@@ -58,18 +58,18 @@ pqc-client delete ID
 ### Shared secrets
 
 ```sh
-pqc-client encap PUBLIC_KEY_FILE CIPHERTEXT_FILE SECRET_FILE
-pqc-client decap ID CIPHERTEXT_FILE SECRET_FILE
+pqc_tz_client encap PUBLIC_KEY_FILE CIPHERTEXT_FILE SECRET_FILE
+pqc_tz_client decap ID CIPHERTEXT_FILE SECRET_FILE
 ```
 
 ### Signatures
 
 ```text
-pqc-client sign ID MESSAGE_FILE SIGNATURE_FILE [CONTEXT_FILE]
-pqc-client verify PUBLIC_KEY_FILE MESSAGE_FILE SIGNATURE_FILE [CONTEXT_FILE]
+pqc_tz_client sign ID MESSAGE_FILE SIGNATURE_FILE [CONTEXT_FILE]
+pqc_tz_client verify PUBLIC_KEY_FILE MESSAGE_FILE SIGNATURE_FILE [CONTEXT_FILE]
 ```
 
-C API: [client/pqc_client.h](client/pqc_client.h).
+C API: [client/pqc_tz_client.h](client/pqc_tz_client.h).
 
 ## Security considerations
 

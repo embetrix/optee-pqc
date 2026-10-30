@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
-#include "pqc_client.h"
+#include "pqc_tz_client.h"
 
 static int read_file(const char *path, uint8_t *buffer, size_t capacity,
 		     size_t *length)
@@ -89,21 +89,21 @@ static void print_id(const uint8_t *id)
 static int usage(void)
 {
 	fputs("Usage:\n"
-	      "  pqc-client generate mlkem512|mlkem768|mlkem1024|mldsa44|mldsa65|mldsa87\n"
-	      "  pqc-client list\n"
-	      "  pqc-client public ID PUBLIC_KEY_FILE\n"
-	      "  pqc-client delete ID\n"
-	      "  pqc-client encap PUBLIC_KEY_FILE CIPHERTEXT_FILE SECRET_FILE\n"
-	      "  pqc-client decap ID CIPHERTEXT_FILE SECRET_FILE\n"
-	      "  pqc-client sign ID MESSAGE_FILE SIGNATURE_FILE [CONTEXT_FILE]\n"
-	      "  pqc-client verify PUBLIC_KEY_FILE MESSAGE_FILE SIGNATURE_FILE [CONTEXT_FILE]\n"
+	      "  pqc_tz_client generate mlkem512|mlkem768|mlkem1024|mldsa44|mldsa65|mldsa87\n"
+	      "  pqc_tz_client list\n"
+	      "  pqc_tz_client public ID PUBLIC_KEY_FILE\n"
+	      "  pqc_tz_client delete ID\n"
+	      "  pqc_tz_client encap PUBLIC_KEY_FILE CIPHERTEXT_FILE SECRET_FILE\n"
+	      "  pqc_tz_client decap ID CIPHERTEXT_FILE SECRET_FILE\n"
+	      "  pqc_tz_client sign ID MESSAGE_FILE SIGNATURE_FILE [CONTEXT_FILE]\n"
+	      "  pqc_tz_client verify PUBLIC_KEY_FILE MESSAGE_FILE SIGNATURE_FILE [CONTEXT_FILE]\n"
 	      "Aliases: mlkem=mlkem768, mldsa=mldsa87. Output files must not exist. Messages are limited to 65536 bytes.\n",
 	      stderr);
 	return EXIT_FAILURE;
 }
 
 struct cli {
-	struct pqc_client client;
+	struct pqc_tz_client client;
 	uint8_t id[PQC_ID_SIZE], pk[PQC_MAX_PK_SIZE], ct[PQC_MAX_CT_SIZE];
 	uint8_t secret[PQC_SECRET_SIZE], signature[PQC_MAX_SIG_SIZE];
 	uint8_t message[PQC_MAX_MESSAGE], context[PQC_MAX_CONTEXT];

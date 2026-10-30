@@ -6,9 +6,9 @@
  */
 #include <stdlib.h>
 #include <string.h>
-#include "pqc_client.h"
+#include "pqc_tz_client.h"
 
-static TEEC_Result local_error(struct pqc_client *client, TEEC_Result result)
+static TEEC_Result local_error(struct pqc_tz_client *client, TEEC_Result result)
 {
 	if (client)
 		client->error_origin = TEEC_ORIGIN_API;
@@ -69,7 +69,7 @@ void pqc_clear(void *buffer, size_t length)
 		*p++ = 0;
 }
 
-TEEC_Result pqc_open(struct pqc_client *client)
+TEEC_Result pqc_open(struct pqc_tz_client *client)
 {
 	const TEEC_UUID uuid = PQC_TA_UUID;
 	TEEC_Result result;
@@ -91,7 +91,7 @@ TEEC_Result pqc_open(struct pqc_client *client)
 	return result;
 }
 
-void pqc_close(struct pqc_client *client)
+void pqc_close(struct pqc_tz_client *client)
 {
 	if (client && client->open) {
 		TEEC_CloseSession(&client->session);
@@ -100,7 +100,7 @@ void pqc_close(struct pqc_client *client)
 	}
 }
 
-TEEC_Result pqc_call(struct pqc_client *client, uint32_t command,
+TEEC_Result pqc_call(struct pqc_tz_client *client, uint32_t command,
 		     const void *request, size_t request_len, void *response,
 		     size_t *response_len)
 {
@@ -159,7 +159,7 @@ done:
 	return result;
 }
 
-TEEC_Result pqc_generate(struct pqc_client *client, uint32_t algorithm,
+TEEC_Result pqc_generate(struct pqc_tz_client *client, uint32_t algorithm,
 			 uint8_t *id)
 {
 	uint8_t request[4];
@@ -170,14 +170,14 @@ TEEC_Result pqc_generate(struct pqc_client *client, uint32_t algorithm,
 			&length);
 }
 
-TEEC_Result pqc_delete(struct pqc_client *client, const uint8_t *id)
+TEEC_Result pqc_delete(struct pqc_tz_client *client, const uint8_t *id)
 {
 	size_t length = 0;
 
 	return pqc_call(client, PQC_DELETE, id, PQC_ID_SIZE, NULL, &length);
 }
 
-TEEC_Result pqc_list(struct pqc_client *client, bool reset, uint8_t *page,
+TEEC_Result pqc_list(struct pqc_tz_client *client, bool reset, uint8_t *page,
 		     size_t *length)
 {
 	uint8_t request[4];
@@ -187,7 +187,7 @@ TEEC_Result pqc_list(struct pqc_client *client, bool reset, uint8_t *page,
 			length);
 }
 
-TEEC_Result pqc_public(struct pqc_client *client, const uint8_t *id,
+TEEC_Result pqc_public(struct pqc_tz_client *client, const uint8_t *id,
 		       uint32_t *algorithm, uint8_t *public_key, size_t *length)
 {
 	uint8_t response[4 + PQC_MAX_PK_SIZE];
@@ -212,7 +212,7 @@ TEEC_Result pqc_public(struct pqc_client *client, const uint8_t *id,
 	return result;
 }
 
-TEEC_Result pqc_encapsulate_ex(struct pqc_client *client, uint32_t algorithm,
+TEEC_Result pqc_encapsulate_ex(struct pqc_tz_client *client, uint32_t algorithm,
 			       const uint8_t *public_key, size_t public_len,
 			       uint8_t *ciphertext, size_t *ciphertext_len,
 			       uint8_t *secret)
@@ -247,7 +247,7 @@ TEEC_Result pqc_encapsulate_ex(struct pqc_client *client, uint32_t algorithm,
 	return result;
 }
 
-TEEC_Result pqc_encapsulate(struct pqc_client *client,
+TEEC_Result pqc_encapsulate(struct pqc_tz_client *client,
 			    const uint8_t *public_key, uint8_t *ciphertext,
 			    uint8_t *secret)
 {
@@ -256,7 +256,7 @@ TEEC_Result pqc_encapsulate(struct pqc_client *client,
 				  PQC_KEM_PK_SIZE, ciphertext, &length, secret);
 }
 
-TEEC_Result pqc_decapsulate_ex(struct pqc_client *client, const uint8_t *id,
+TEEC_Result pqc_decapsulate_ex(struct pqc_tz_client *client, const uint8_t *id,
 			       const uint8_t *ciphertext, size_t ciphertext_len,
 			       uint8_t *secret)
 {
@@ -281,13 +281,13 @@ TEEC_Result pqc_decapsulate_ex(struct pqc_client *client, const uint8_t *id,
 	return result;
 }
 
-TEEC_Result pqc_decapsulate(struct pqc_client *client, const uint8_t *id,
+TEEC_Result pqc_decapsulate(struct pqc_tz_client *client, const uint8_t *id,
 			    const uint8_t *ciphertext, uint8_t *secret)
 {
 	return pqc_decapsulate_ex(client, id, ciphertext, PQC_CT_SIZE, secret);
 }
 
-static TEEC_Result dsa(struct pqc_client *client, bool sign, uint32_t algorithm,
+static TEEC_Result dsa(struct pqc_tz_client *client, bool sign, uint32_t algorithm,
 		       const uint8_t *key, const uint8_t *message,
 		       size_t message_len, const uint8_t *context,
 		       size_t context_len, const uint8_t *signature,
@@ -342,7 +342,7 @@ static TEEC_Result dsa(struct pqc_client *client, bool sign, uint32_t algorithm,
 	return result;
 }
 
-TEEC_Result pqc_sign_ex(struct pqc_client *client, const uint8_t *id,
+TEEC_Result pqc_sign_ex(struct pqc_tz_client *client, const uint8_t *id,
 			const uint8_t *message, size_t message_len,
 			const uint8_t *context, size_t context_len,
 			uint8_t *signature, size_t *signature_len)
@@ -351,7 +351,7 @@ TEEC_Result pqc_sign_ex(struct pqc_client *client, const uint8_t *id,
 		   context_len, NULL, signature, signature_len);
 }
 
-TEEC_Result pqc_sign(struct pqc_client *client, const uint8_t *id,
+TEEC_Result pqc_sign(struct pqc_tz_client *client, const uint8_t *id,
 		     const uint8_t *message, size_t message_len,
 		     const uint8_t *context, size_t context_len,
 		     uint8_t *signature)
@@ -365,7 +365,7 @@ TEEC_Result pqc_sign(struct pqc_client *client, const uint8_t *id,
 	return result;
 }
 
-TEEC_Result pqc_verify_ex(struct pqc_client *client, uint32_t algorithm,
+TEEC_Result pqc_verify_ex(struct pqc_tz_client *client, uint32_t algorithm,
 			  const uint8_t *public_key, size_t public_len,
 			  const uint8_t *message, size_t message_len,
 			  const uint8_t *context, size_t context_len,
@@ -379,7 +379,7 @@ TEEC_Result pqc_verify_ex(struct pqc_client *client, uint32_t algorithm,
 		   context, context_len, signature, NULL, &size);
 }
 
-TEEC_Result pqc_verify(struct pqc_client *client, const uint8_t *public_key,
+TEEC_Result pqc_verify(struct pqc_tz_client *client, const uint8_t *public_key,
 		       const uint8_t *message, size_t message_len,
 		       const uint8_t *context, size_t context_len,
 		       const uint8_t *signature)
