@@ -3,6 +3,7 @@ project(optee_pqc VERSION 0.1.0 LANGUAGES C)
 
 option(PQC_BUILD_TA "Build the ARM32 or ARM64 OP-TEE TA using its own devkit" OFF)
 option(PQC_BUILD_CLIENT "Build the Linux libteec client" OFF)
+option(PQC_LEANCRYPTO_ASM "Enable Leancrypto AArch64 assembly/NEON (requires TA float support)" OFF)
 set(PQC_TA_DEV_KIT "" CACHE PATH "Matching OP-TEE export-ta_arm32 or export-ta_arm64 directory")
 set(PQC_TA_CROSS_COMPILE "" CACHE STRING "TA compiler prefix (empty selects from devkit architecture)")
 set(PQC_TEEC_ROOT "" CACHE PATH "libteec installation prefix for the Linux target")
@@ -18,6 +19,9 @@ if(PQC_BUILD_TA)
     if(PQC_TA_SM MATCHES "ta_arm64")
         set(PQC_TA_DEFAULT_PREFIX "aarch64-linux-gnu-")
     elseif(PQC_TA_SM MATCHES "ta_arm32")
+        if(PQC_LEANCRYPTO_ASM)
+            message(FATAL_ERROR "PQC_LEANCRYPTO_ASM requires an ARM64 TA devkit")
+        endif()
         set(PQC_TA_DEFAULT_PREFIX "arm-linux-gnueabihf-")
     else()
         message(FATAL_ERROR "Unsupported TA architecture in devkit mk/conf.mk")
@@ -31,6 +35,7 @@ if(PQC_BUILD_TA)
         COMMAND "${PQC_MAKE}" -C "${CMAKE_CURRENT_SOURCE_DIR}/ta"
             "TA_DEV_KIT_DIR=${PQC_TA_DEV_KIT}"
             "CROSS_COMPILE=${PQC_TA_PREFIX}"
+            "PQC_LEANCRYPTO_ASM=$<BOOL:${PQC_LEANCRYPTO_ASM}>"
             "O=${CMAKE_CURRENT_BINARY_DIR}/ta"
         BYPRODUCTS
             "${CMAKE_CURRENT_BINARY_DIR}/ta/leancrypto/libleancrypto-optee.a"

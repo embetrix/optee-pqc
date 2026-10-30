@@ -6,8 +6,7 @@
 # SHA-3/KMAC/XDRBG and their self-tests. One option per line; blank lines and
 # '#' comments are ignored by ta/leancrypto/build.py.
 
-# Portable C only - the TA never runs the AVX2/NEON/RISC-V assembly paths.
--Ddisable-asm=true
+# Assembly is controlled by PQC_LEANCRYPTO_ASM (default: off) in build.py.
 
 # ML-DSA-44/65/87 signatures and ML-KEM-512/768/1024 key agreement.
 -Dkyber_768=enabled
@@ -46,6 +45,11 @@
 -Dhqc_256=disabled
 -Dhqc_192=disabled
 -Dhqc_128=disabled
+-Dsntrup_1277=disabled
+-Dsntrup_1013=disabled
+-Dsntrup_953=disabled
+-Dsntrup_857=disabled
+-Dsntrup_761=disabled
 -Dsphincs_shake_256s=disabled
 -Dsphincs_shake_256f=disabled
 -Dsphincs_shake_192s=disabled

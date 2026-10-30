@@ -9,6 +9,9 @@
 #include "lc_kyber.h"
 #include "lc_init.h"
 #include "lc_memset_secure.h"
+#ifdef LC_HOST_AARCH64
+#include "cpufeatures.h"
+#endif
 
 static TEE_Result convert(int error)
 {
@@ -64,6 +67,14 @@ static enum lc_dilithium_type dsa_type(uint32_t algorithm)
 
 TEE_Result pqc_crypto_init(void)
 {
+#ifdef LC_HOST_AARCH64
+	/*
+	 * The build requires TA FP/SIMD support. Select baseline ARMv8/NEON
+	 * before lc_init(): upstream's native CPU probe reads an EL1 register
+	 * that a user TA cannot access. Do not assume optional SHA3 extensions.
+	 */
+	lc_cpu_feature_set(LC_CPU_FEATURE_ARM | LC_CPU_FEATURE_ARM_NEON);
+#endif
 	return convert(lc_init(0));
 }
 

@@ -4,6 +4,7 @@
 #
 BINARY = 7b1e6f40-9c32-4da8-a567-71930c4e82b6
 CFG_TEE_TA_LOG_LEVEL ?= 1
+PQC_LEANCRYPTO_ASM ?= 0
 # Never mix generated files with the TA sources, including for direct make.
 O ?= $(CURDIR)/../build/ta
 override O := $(shell python3 leancrypto/build.py --output-directory "$(O)")
@@ -16,6 +17,7 @@ include $(TA_DEV_KIT_DIR)/mk/ta_dev_kit.mk
 # Export values directly, without interpolating compiler flags into shell code.
 export TA_DEV_KIT_DIR
 export LC_BUILD
+export PQC_LEANCRYPTO_ASM
 export LC_COMPILER_PREFIX := $(CROSS_COMPILE_$(sm))
 export LC_ARCH := $(sm)
 export LC_CFLAGS := $(filter-out $(CFLAGS_REMOVE) $(cflags-remove) $(cflags-remove-$(sm)),$(CFLAGS$(arch-bits-$(sm))) $(CFLAGS) $(cflags$(sm)))

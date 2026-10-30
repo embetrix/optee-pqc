@@ -108,6 +108,15 @@ def build():
     families = {'ta_arm32': 'arm', 'ta_arm64': 'aarch64'}
     if arch not in families:
         raise ValueError(f'Unsupported TA architecture: {arch}')
+    asm = os.environ.get('PQC_LEANCRYPTO_ASM', '0')
+    if asm not in {'0', '1'}:
+        raise ValueError('PQC_LEANCRYPTO_ASM must be 0 or 1')
+    if asm == '1':
+        if arch != 'ta_arm64':
+            raise ValueError('PQC_LEANCRYPTO_ASM requires an ARM64 TA devkit')
+        if not re.search(r'^CFG_TA_FLOAT_SUPPORT\s*:?=\s*y\s*$',
+                         (devkit / 'mk/conf.mk').read_text(), re.MULTILINE):
+            raise ValueError('PQC_LEANCRYPTO_ASM requires CFG_TA_FLOAT_SUPPORT=y in the devkit')
     prefix = os.environ['LC_COMPILER_PREFIX']
     if not prefix:
         raise ValueError('CROSS_COMPILE must select the TA compiler')
@@ -134,6 +143,7 @@ def build():
     options = [line.split('#', 1)[0].strip()
                for line in (SHIM / 'meson-options.txt').read_text().splitlines()]
     options = [line for line in options if line]
+    options.append('-Ddisable-asm=' + ('false' if asm == '1' else 'true'))
     identity = hashlib.sha256((cross + run(compiler, '--version', capture=True) +
                                (devkit / 'mk/conf.mk').read_text()).encode()).hexdigest()
     output.mkdir(parents=True, exist_ok=True)

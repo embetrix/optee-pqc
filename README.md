@@ -30,6 +30,11 @@ cmake -S . -B build \
 cmake --build build
 ```
 
+Optional ARM64 assembly/NEON: add `-DPQC_LEANCRYPTO_ASM=ON` to CMake
+(default: `OFF`). Requires an ARM64 devkit with `CFG_TA_FLOAT_SUPPORT=y`.
+For direct TA builds, use `make ... PQC_LEANCRYPTO_ASM=1`.
+The pinned Leancrypto version keeps ML-KEM-512 and ML-DSA-44 PQC code in C.
+
 ## Install
 
 ```sh

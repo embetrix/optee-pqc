@@ -12,6 +12,7 @@
 #ifndef PQC_LEANCRYPTO_CONFIG_H
 #define PQC_LEANCRYPTO_CONFIG_H
 
+#ifndef __ASSEMBLER__
 #define LC_OPTEE
 
 /* Preinclude the OP-TEE platform header before upstream's ext_headers.h. */
@@ -24,4 +25,5 @@
 	void func(void);               \
 	void func(void)
 
+#endif /* !__ASSEMBLER__ */
 #endif
