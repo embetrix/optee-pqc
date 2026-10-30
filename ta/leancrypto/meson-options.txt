@@ -1,0 +1,107 @@
+#
+# (C) Copyright 2026
+# Embetrix Embedded Systems Solutions, ayoub.zaki@embetrix.com
+#
+# Leancrypto configuration for the OP-TEE TA: all ML-KEM and ML-DSA parameter sets,
+# SHA-3/KMAC/XDRBG and their self-tests. One option per line; blank lines and
+# '#' comments are ignored by ta/leancrypto/build.py.
+
+# Portable C only - the TA never runs the AVX2/NEON/RISC-V assembly paths.
+-Ddisable-asm=true
+
+# ML-DSA-44/65/87 signatures and ML-KEM-512/768/1024 key agreement.
+-Dkyber_768=enabled
+-Dkyber_1024=enabled
+-Dkyber_512=enabled
+-Dkyber_x25519=disabled
+-Dkyber_x448=disabled
+-Ddilithium_87=enabled
+-Ddilithium_65=enabled
+-Ddilithium_44=enabled
+-Ddilithium_ed25519=disabled
+-Ddilithium_ed448=disabled
+-Ddilithium_keygen=enabled
+-Ddilithium_siggen=enabled
+-Ddilithium_sigver=enabled
+-Dkyber_debug=disabled
+
+# Hashing, MAC and DRNG that the two schemes are built on.
+-Dsha3=enabled
+-Dkmac=enabled
+-Dxdrbg=enabled
+-Dseedsource=builtin
+-Denable_selftests=enabled
+
+# TA stacks are a few KiB, so large intermediate state must live on the heap.
+-Dsmall_stack=enabled
+
+# Everything else off.
+-Ded25519=disabled
+-Dx25519=disabled
+-Ded448=disabled
+-Dx448=disabled
+-Dbike_5=disabled
+-Dbike_3=disabled
+-Dbike_1=disabled
+-Dhqc_256=disabled
+-Dhqc_192=disabled
+-Dhqc_128=disabled
+-Dsphincs_shake_256s=disabled
+-Dsphincs_shake_256f=disabled
+-Dsphincs_shake_192s=disabled
+-Dsphincs_shake_192f=disabled
+-Dsphincs_shake_128s=disabled
+-Dsphincs_shake_128f=disabled
+-Dsphincs_keygen=disabled
+-Dsphincs_siggen=disabled
+-Dsphincs_sigver=disabled
+-Dslh_dsa_ascon_128s=disabled
+-Dslh_dsa_ascon_128f=disabled
+-Dsha2-256=disabled
+-Dsha2-512=disabled
+-Dascon=disabled
+-Dascon_keccak=disabled
+-Daes_block=disabled
+-Daes_ecb=disabled
+-Daes_cbc=disabled
+-Daes_ctr=disabled
+-Daes_kw=disabled
+-Daes_gcm=disabled
+-Daes_xts=disabled
+-Dchacha20=disabled
+-Dchacha20poly1305=disabled
+-Dchacha20_drng=disabled
+-Dhmac=disabled
+-Dhkdf=disabled
+-Dkdf_ctr=disabled
+-Dkdf_fb=disabled
+-Dkdf_dpi=disabled
+-Dpbkdf2=disabled
+-Dhash_crypt=disabled
+-Ddrbg_hash=disabled
+-Ddrbg_hmac=disabled
+-Ddrbg_ctr=disabled
+-Dkmac_drng=disabled
+-Dcshake_drng=disabled
+-Dhotp=disabled
+-Dtotp=disabled
+-Dx509_parser=disabled
+-Dx509_csr_parser=disabled
+-Dx509_generator=disabled
+-Dx509_csr_generator=disabled
+-Dpkcs7_parser=disabled
+-Dpkcs7_generator=disabled
+-Dpkcs8_parser=disabled
+-Dpkcs8_generator=disabled
+-Dsbsigntools=disabled
+-Defi=disabled
+-Dsecure_execution=disabled
+-Dapps=disabled
+-Dtests=disabled
+-Driscv_rvv_vlen128=disabled
+-Driscv_rvv_vlen256=disabled
+-Dlc_jent_ntg1=disabled
+-Dlc_jent_all_caches=disabled
+-Dtimecop=disabled
+-Dpkcs7_debug=disabled
+-Dfips140_negative=disabled

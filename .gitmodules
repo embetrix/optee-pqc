@@ -1,0 +1,4 @@
+[submodule "external/leancrypto"]
+	path = external/leancrypto
+	url = https://github.com/smuellerDD/leancrypto.git
+	branch = master
