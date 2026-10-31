@@ -5,12 +5,12 @@
 #include <stdint.h>
 
 #define PQC_TA_UUID                                                    \
-	{                                                              \
-		0x7b1e6f40, 0x9c32, 0x4da8,                            \
-		{                                                      \
-			0xa5, 0x67, 0x71, 0x93, 0x0c, 0x4e, 0x82, 0xb6 \
-		}                                                      \
-	}
+        {                                                              \
+                0x7b1e6f40, 0x9c32, 0x4da8,                            \
+                {                                                      \
+                        0xa5, 0x67, 0x71, 0x93, 0x0c, 0x4e, 0x82, 0xb6 \
+                }                                                      \
+        }
 #define PQC_TA_UUID_STRING "7b1e6f40-9c32-4da8-a567-71930c4e82b6"
 #define PQC_VERSION 1u
 #define PQC_MLKEM768 1u
