@@ -57,10 +57,7 @@ enum pqc_command {
 	PQC_VERIFY_ALG
 };
 
-/*
- * Wire integers are little endian, never native structs. See
- * docs/architecture.md.
- */
+/* Wire integers are little endian, never native structs. */
 static inline uint32_t pqc_get32(const uint8_t *p)
 {
 	return (uint32_t)p[0] | (uint32_t)p[1] << 8 | (uint32_t)p[2] << 16 |

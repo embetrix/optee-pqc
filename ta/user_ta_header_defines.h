@@ -14,6 +14,6 @@
 		  TA_FLAG_INSTANCE_KEEP_ALIVE)
 #define TA_STACK_SIZE (32 * 1024)
 #define TA_DATA_SIZE (1024 * 1024)
-#define TA_VERSION "0.2"
-#define TA_DESCRIPTION "Persistent ML-KEM-768 and ML-DSA-87 prototype"
+#define TA_VERSION "0.2.0"
+#define TA_DESCRIPTION "Persistent ML-KEM and ML-DSA prototype"
 #endif

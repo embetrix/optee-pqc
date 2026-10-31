@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(optee_pqc VERSION 0.1.0 LANGUAGES C)
+project(optee_pqc VERSION 0.2.0 LANGUAGES C)
 
 option(PQC_BUILD_TA "Build the ARM32 or ARM64 OP-TEE TA using its own devkit" OFF)
 option(PQC_BUILD_CLIENT "Build the Linux libteec client" OFF)
