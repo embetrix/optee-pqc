@@ -1,20 +1,31 @@
 # optee-pqc
 
-OP-TEE TA and Linux client using
-[Leancrypto][leancrypto].
+Post-quantum cryptography in an OP-TEE Trusted Application (TA) using
+[leancrypto](https://github.com/smuellerDD/leancrypto), with a Linux command-line
+client and C API.
 
-- ML-KEM: 512, 768 and 1024
-- ML-DSA: 44, 65 and 87
+The TA links leancrypto directly and exposes operations through a custom command
+interface. Private keys stay in the TA. KEM shared secrets are returned to Linux.
 
-Private keys stay in the TA. Shared secrets return
-to Linux. Experimental. Do not use in production.
+| Algorithm | Parameter sets | Operations |
+| --- | --- | --- |
+| ML-KEM | 512, 768, 1024 | Key generation, encapsulation, decapsulation |
+| ML-DSA | 44, 65, 87 | Key generation, signing, verification |
+
+> Experimental. Do not use in production. See [Security limitations](#security-limitations).
 
 ## Build
 
-Needs a Linux SDK with libteec and a matching
-OP-TEE TA devkit. Tools: CMake 3.22+, Make, GCC,
-Meson, Ninja and Python 3. Install the devkit's
-Python signing packages too.
+### Prerequisites
+
+- Linux SDK with libteec and a matching OP-TEE TA devkit.
+- CMake 3.22+, Make, GCC, Meson, Ninja and Python 3.
+- Python signing dependencies required by the TA devkit.
+
+### Compile and install
+
+Initialize the leancrypto submodule, then configure the build with your SDK and
+TA devkit paths. This example targets ARM64.
 
 ```sh
 git submodule update --init external/leancrypto
@@ -31,79 +42,87 @@ DESTDIR=/path/to/staging \
   cmake --install build --prefix /usr
 ```
 
-Copy the client to the target's PATH. Copy the
-`.ta` file to the target's TA search directory.
-The target needs OP-TEE and tee-supplicant.
+Deploy the staged client to a directory in the target's `PATH` and the `.ta` file
+into its TA search directory. The target must run OP-TEE and `tee-supplicant`.
 
-Assembly is off by default. Add
-`-DPQC_LEANCRYPTO_ASM=ON` to enable it on ARM64.
-The devkit needs `CFG_TA_FLOAT_SUPPORT=y`.
-ML-KEM-512 and ML-DSA-44 still use C for their PQC
-code.
+### ARM64 assembly
 
-## Commands
+Assembly is disabled by default. To enable it, add `-DPQC_LEANCRYPTO_ASM=ON` to the
+CMake command and use a TA devkit built with `CFG_TA_FLOAT_SUPPORT=y`.
+ML-KEM-512 and ML-DSA-44 still use C for their PQC code.
 
-`generate` prints the key ID. Algorithm names:
-`mlkem512`, `mlkem768`, `mlkem1024`, `mldsa44`,
-`mldsa65`, `mldsa87`.
+## Usage
 
-Output files must not already exist. Context is
-optional.
+The client accepts the following algorithm names.
+
+- ML-KEM `mlkem512`, `mlkem768`, `mlkem1024`
+- ML-DSA `mldsa44`, `mldsa65`, `mldsa87`
+
+In the examples below, `ID` is the key ID printed by `generate`. The other
+uppercase arguments are file paths. Output files must not already exist.
+
+### Manage keys
 
 ```sh
 pqc_tz_client generate mlkem768
 pqc_tz_client list
 pqc_tz_client public ID PUBLIC_KEY
 pqc_tz_client delete ID
-
-pqc_tz_client encap PUBLIC_KEY CIPHERTEXT SECRET
-pqc_tz_client decap ID CIPHERTEXT SECRET
-
-pqc_tz_client sign ID MESSAGE SIGNATURE [CONTEXT]
-pqc_tz_client verify PUBLIC_KEY MESSAGE \
-  SIGNATURE [CONTEXT]
 ```
 
-C API: [pqc_tz_client.h](client/pqc_tz_client.h).
+### Encapsulate and decapsulate
 
-## Tests
-
-Copy [pqc-tz-test.sh](tests/pqc-tz-test.sh) to the
-target's PATH.
+Use an ML-KEM key to encapsulate a shared secret and recover it by decapsulation.
 
 ```sh
+pqc_tz_client encap PUBLIC_KEY CIPHERTEXT SECRET
+pqc_tz_client decap ID CIPHERTEXT SECRET
+```
+
+### Sign and verify
+
+Use an ML-DSA key for signatures. The context file is optional.
+
+```sh
+pqc_tz_client sign ID MESSAGE SIGNATURE [CONTEXT]
+pqc_tz_client verify PUBLIC_KEY MESSAGE SIGNATURE [CONTEXT]
+```
+
+For integration into a Linux application, use the C API in
+[pqc_tz_client.h](client/pqc_tz_client.h).
+
+## Tests and benchmarks
+
+Copy [pqc-tz-test.sh](tests/pqc-tz-test.sh) to a directory in the target's `PATH`.
+Run it with the options below.
+
+```sh
+# Run functional tests and benchmarks
 pqc-tz-test.sh
 
+# Use 50 measured runs per case and save reports to ./results
 PQC_BENCH_RUNS=50 PQC_BENCH_DIR=./results \
   pqc-tz-test.sh
 
-# Skip benchmarks
+# Run functional tests only
 PQC_TZ_TIMING=0 pqc-tz-test.sh
 ```
 
-Tests all six algorithms. ML-DSA messages range
-from 0 to 64 KiB. ML-KEM uses fixed input sizes.
-Each case has 5 measured runs by default, after
-one warm-up. The TA stays alive between calls.
+The suite covers all six parameter sets, with ML-DSA messages from 0 to 64 KiB
+and fixed-size ML-KEM inputs. By default, each benchmark case runs once to warm
+up, followed by five measured runs. The TA stays alive between calls.
 
-Prints min, median, average and max times in
-milliseconds. Saves `summary.csv` and
-`samples.csv` in the printed directory.
-`PQC_BENCH_DIR` must not already exist. Without
-it, reports go to a temporary directory. Test keys
-and working files are removed.
+Results include minimum, median, average and maximum times in milliseconds.
+The script saves `summary.csv` and `samples.csv` to the printed report directory.
+`PQC_BENCH_DIR` must name a directory that does not already exist. If omitted,
+reports go to a temporary directory. Test keys and working files are removed.
 
-Timing includes the command call and TA work. It
-excludes session setup and client file I/O. Set
-`PQC_TZ_TIMING=1` to print timing for individual
-client commands.
+Timing includes command invocation and TA execution, excluding session setup and
+client file I/O. Set `PQC_TZ_TIMING=1` to print timing for individual client commands.
 
-## Limits
+## Security limitations
 
 - All callers can use or delete any stored key.
 - REE storage has no rollback protection.
-- Keep storage files across reboots to keep keys.
-- Linux must protect returned shared secrets.
-
-[leancrypto]:
-  https://github.com/smuellerDD/leancrypto
+- Storage files must be preserved across reboots to retain keys.
+- Linux is responsible for protecting returned shared secrets.
