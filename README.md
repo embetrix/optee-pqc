@@ -7,10 +7,10 @@ client and C API.
 The TA links leancrypto directly and exposes operations through a custom command
 interface. Private keys stay in the TA. KEM shared secrets are returned to Linux.
 
-| Algorithm | Parameter sets | Operations |
-| --- | --- | --- |
-| ML-KEM | 512, 768, 1024 | Key generation, encapsulation, decapsulation |
-| ML-DSA | 44, 65, 87 | Key generation, signing, verification |
+| Algorithm | FIPS | Parameter sets | Operations |
+| --- | --- | --- | --- |
+| ML-KEM | [203](https://csrc.nist.gov/pubs/fips/203/final) | 512, 768, 1024 | Key generation, encapsulation, decapsulation |
+| ML-DSA | [204](https://csrc.nist.gov/pubs/fips/204/final) | 44, 65, 87 | Key generation, signing, verification |
 
 > Experimental. Do not use in production. See [Security limitations](#security-limitations).
 
