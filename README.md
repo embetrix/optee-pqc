@@ -72,12 +72,25 @@ pqc_tz_client delete ID
 
 ### Encapsulate and decapsulate
 
-Use an ML-KEM key to encapsulate a shared secret and recover it by decapsulation.
+ML-KEM encapsulation produces a ciphertext and a 32-byte shared secret.
+The recipient recovers the same secret from the ciphertext using the matching
+private key stored in the TA.
 
 ```sh
-pqc_tz_client encap PUBLIC_KEY CIPHERTEXT SECRET
-pqc_tz_client decap ID CIPHERTEXT SECRET
+key_id=$(pqc_tz_client generate mlkem768)
+pqc_tz_client public "$key_id" public.bin
+
+# Sender: write the ciphertext and the shared secret to separate files
+pqc_tz_client encap public.bin ciphertext.bin sender-secret.bin
+
+# Recipient: retrieve the shared secret using the stored private key
+pqc_tz_client decap "$key_id" ciphertext.bin recipient-secret.bin
+
+# Confirm both sides obtained the same secret (no output means they match)
+cmp sender-secret.bin recipient-secret.bin
 ```
+
+`decap` writes the recovered 32-byte shared secret to `recipient-secret.bin`.
 
 ### Sign and verify
 
